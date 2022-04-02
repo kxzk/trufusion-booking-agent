@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -35,6 +35,8 @@ func main() {
 	resp, _ := c.Do(req)
 	defer resp.Body.Close()
 
+	log.Println("Initial Response -> ", resp.StatusCode)
+
 	body, _ := ioutil.ReadAll(resp.Body)
 	strBody := string(body)
 
@@ -56,6 +58,8 @@ func main() {
 		}
 	}
 
+	log.Println("Parts -> ", parts)
+
 	// parts[0] -> utf8
 	// parts[1] -> authenticity_token
 
@@ -65,6 +69,8 @@ func main() {
 	user.Add("utf8", parts[0])
 	user.Add("authenticity_token", parts[1])
 
+	log.Println("User -> ", user)
+
 	signIn := "https://cart.mindbodyonline.com/sites/14486/session/"
 
 	req2, _ := http.NewRequest("POST", signIn, strings.NewReader(user.Encode()))
@@ -73,10 +79,7 @@ func main() {
 	resp2, _ := c.Do(req2)
 	defer resp2.Body.Close()
 
-	body2, _ := ioutil.ReadAll(resp2.Body)
-
-	// TODO: figure out what to do with these since I don't need them
-	_ = body2
+	log.Println("SignIn Response -> ", resp2.StatusCode)
 
 	// TODO: figure out how to programatically generate these for each of Katrina's classes
 	// theoretically, will  need to run Mon-Thurs and it will just be current_date() + 7 days
@@ -84,22 +87,18 @@ func main() {
 	//
 	// need to figure out if ID is increasing, random or able to be pre-populated or going
 	// to have to scrape to get it -> item_mbo_id
+	//
+	// Have to have item_mbo_id in URL -> how to get?
 	req3, _ := http.NewRequest("GET", "https://cart.mindbodyonline.com/sites/14486/cart/add_booking?item%5Binfo%5D=Mon.+Apr++4%2C+2022++9%3A00+pm&item%5Bmbo_id%5D=114627&item%5Bmbo_location_id%5D=1&item%5Bname%5D=60+Min.+Hot+Power+Vinyasa+%28Level+1%2F2%29+&item%5Btype%5D=Class&source=schedule_v1&ga_client_id=undefined", nil)
 
 	resp3, _ := c.Do(req3)
 	defer resp3.Body.Close()
-
-	body3, _ := ioutil.ReadAll(resp3.Body)
-
-	fmt.Println(string(body3))
 
 	req4, _ := http.NewRequest("GET", "https://cart.mindbodyonline.com/sites/14486/cart/proceed_to_checkout", nil)
 
 	resp4, _ := c.Do(req4)
 	defer resp4.Body.Close()
 
-	body4, _ := ioutil.ReadAll(resp4.Body)
-
-	fmt.Println(string(body4))
+	log.Println("Checkout Resposne -> ", resp4.StatusCode)
 
 }
