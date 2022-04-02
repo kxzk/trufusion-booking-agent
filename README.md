@@ -7,13 +7,14 @@ chance I'm doing that, so here we are.
 
 #### TODO
 
--  simplify all requests
--  extract + improve `utf8` + `auth_token` process
--  extract func for `user`
--  something better for `user` + `pass`
--  improve project structure
--  add tests
--  setup automated testing
+- add logging
+- simplify all requests
+- extract + improve `utf8` + `auth_token` process
+- extract func for `user`
+- something better for `user` + `pass`
+- improve project structure
+- add tests
+- setup automated testing
 
 #### KT Class Schedule
 
