@@ -28,15 +28,20 @@ var classPreference = map[string]int{
 	"Friday":    0, // kettlebell
 }
 
-func main() {
+func httpClient() *http.Client {
 	jar, _ := cookiejar.New(nil)
-	c := &http.Client{Jar: jar}
+	client := &http.Client{Jar: jar}
+	return client
+}
+
+func main() {
+	client := httpClient()
 
 	// TODO: create function for all these requests + responses
 	req, _ := http.NewRequest("GET", session, nil)
 	req.Header.Add("Connection", "keep-alive")
 
-	resp, _ := c.Do(req)
+	resp, _ := client.Do(req)
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
@@ -75,7 +80,7 @@ func main() {
 	req2, _ := http.NewRequest("POST", login, strings.NewReader(user.Encode()))
 	req2.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	resp2, _ := c.Do(req2)
+	resp2, _ := client.Do(req2)
 	defer resp2.Body.Close()
 
 	nextWeekDate := getNextWeekDate()
@@ -95,12 +100,12 @@ func main() {
 	// adds desired class to our cart
 	req3, _ := http.NewRequest("GET", classLink, nil)
 
-	resp3, _ := c.Do(req3)
+	resp3, _ := client.Do(req3)
 	defer resp3.Body.Close()
 
 	// this request will proceed with checking out the class in our cart
 	req4, _ := http.NewRequest("GET", checkout, nil)
 
-	resp4, _ := c.Do(req4)
+	resp4, _ := client.Do(req4)
 	defer resp4.Body.Close()
 }
