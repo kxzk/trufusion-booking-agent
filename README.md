@@ -8,9 +8,7 @@ chance I'm doing that, so here we are.
 #### TODO
 
 - add logging
-- simplify all requests
-- extract + improve `utf8` + `auth_token` process
-- extract func for `user`
+- handle errors
 - something better for `user` + `pass`
 - improve project structure
 - add tests
