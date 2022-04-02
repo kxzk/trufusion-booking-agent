@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -11,14 +12,12 @@ import (
 
 // TODO: fix this, hacky AF
 const (
-	USERNAME = ""
-	PASSWORD = ""
-)
-
-var (
+	username = ""
+	password = ""
 	session  = "https://cart.mindbodyonline.com/sites/14486/session/new"
 	login    = "https://cart.mindbodyonline.com/sites/14486/session/"
 	checkout = "https://cart.mindbodyonline.com/sites/14486/cart/proceed_to_checkout"
+	utf8     = "&#x2713"
 )
 
 var classPreference = map[string]int{
@@ -34,60 +33,52 @@ func httpClient() *http.Client {
 	return client
 }
 
+func request(client *http.Client, method, url string, body io.Reader) *http.Response {
+	req, _ := http.NewRequest(method, url, body)
+	resp, _ := client.Do(req)
+	return resp
+}
+
+func getAuthToken(body string) string {
+	re := regexp.MustCompile(`authenticity_token\" value=\"(.*)"`)
+	match := re.FindStringSubmatch(body)[1] // grab actual value
+
+	// TODO: make test
+	// if len(match) != 86 {
+	// }
+
+	return match
+}
+
+func getEncodedVals(user, pass, utf, auth string) string {
+	vals := url.Values{}
+	vals.Add("mb_client_session[username]", user)
+	vals.Add("mb_client_session[password]", pass)
+	vals.Add("utf8", utf)
+	vals.Add("authenticity_token", auth)
+
+	return vals.Encode()
+}
+
 func main() {
 	client := httpClient()
 
-	// TODO: create function for all these requests + responses
-	req, _ := http.NewRequest("GET", session, nil)
-	req.Header.Add("Connection", "keep-alive")
+	// start session and get `authenticity_token` from body
+	sessReq := request(client, "GET", session, nil)
+	defer sessReq.Body.Close()
 
-	resp, _ := client.Do(req)
-	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(sessReq.Body)
 
-	body, _ := ioutil.ReadAll(resp.Body)
-	strBody := string(body)
-
-	// TODO: extract out into function
-	// TODO: improve regex to be more exact
-	//
-	// only need `utf8` and `authenticity_token`
-	re := regexp.MustCompile(`<input.*>`)
-
-	matches := re.FindAllStringSubmatch(strBody, -1)
-
-	splitMatches := strings.Split(matches[0][0], " ")
-
-	var parts []string
-	// parts[0] -> utf8
-	// parts[1] -> authenticity_token
-
-	for _, s := range splitMatches {
-		if strings.HasPrefix(s, "value=") {
-			s = strings.Replace(s, "value=", "", -1)
-			s = strings.Replace(s, "\"", "", -1)
-			parts = append(parts, s)
-		}
-	}
-
-	// TODO: extract out into function
-	user := url.Values{}
-	user.Add("mb_client_session[username]", USERNAME)
-	user.Add("mb_client_session[password]", PASSWORD)
-	user.Add("utf8", parts[0])
-	user.Add("authenticity_token", parts[1])
+	authToken := getAuthToken(string(body))
+	encodedVals := getEncodedVals(username, password, utf8, authToken)
 
 	// login to mindbodyonline with account
-	req2, _ := http.NewRequest("POST", login, strings.NewReader(user.Encode()))
-	req2.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	resp2, _ := client.Do(req2)
-	defer resp2.Body.Close()
+	loginReq := request(client, "POST", login, strings.NewReader(encodeVals))
+	defer loginReq.Body.Close()
 
 	nextWeekDate := getNextWeekDate()
 	_, isoWeek := nextWeekDate.ISOWeek()
 	dayOfWeek := nextWeekDate.Weekday().String()
-
-	// TODO: add check to make sure only runs on Mon-Wed +  Fri
 
 	class := classSchedule[dayOfWeek][classPreference[dayOfWeek]]
 
@@ -98,14 +89,10 @@ func main() {
 	classLink := getClassLink(classDate, classID, classURL)
 
 	// adds desired class to our cart
-	req3, _ := http.NewRequest("GET", classLink, nil)
-
-	resp3, _ := client.Do(req3)
-	defer resp3.Body.Close()
+	classLinkReq := request(client, "GET", classLink, nil)
+	defer classLinkReq.Body.Close()
 
 	// this request will proceed with checking out the class in our cart
-	req4, _ := http.NewRequest("GET", checkout, nil)
-
-	resp4, _ := client.Do(req4)
-	defer resp4.Body.Close()
+	checkoutReq := request(client, "GET", checkout, nil)
+	defer checkoutReq.Body.Close()
 }
