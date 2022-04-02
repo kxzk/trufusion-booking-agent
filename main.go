@@ -73,7 +73,7 @@ func main() {
 	encodedVals := getEncodedVals(username, password, utf8, authToken)
 
 	// login to mindbodyonline with account
-	loginReq := request(client, "POST", login, strings.NewReader(encodeVals))
+	loginReq := request(client, "POST", login, strings.NewReader(encodedVals))
 	defer loginReq.Body.Close()
 
 	nextWeekDate := getNextWeekDate()
