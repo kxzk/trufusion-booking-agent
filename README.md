@@ -7,13 +7,13 @@ chance I'm doing that, so here we are.
 
 #### TODO
 
-- [] simplify all requests
-- [] extract + improve `utf8` + `auth_token` process
-- [] extract func for `user`
-- [] something better for `user` + `pass`
-- [] improve project structure
-- [] add tests
-- [] setup automated testing
+-  simplify all requests
+-  extract + improve `utf8` + `auth_token` process
+-  extract func for `user`
+-  something better for `user` + `pass`
+-  improve project structure
+-  add tests
+-  setup automated testing
 
 #### KT Class Schedule
 
@@ -50,5 +50,7 @@ chance I'm doing that, so here we are.
 * (iso week 14 ID value) + (offset) = (future class ID)
 
 ```python3
-link = f"https://cart.mindbodyonline.com/sites/14486/cart/add_booking?item%5Binfo%5D={DATE}&item%5Bmbo_id%5D={CLASS_ID}&item%5Bmbo_location_id%5D=1&item%5Bname%5D={CLASS}&item%5Btype%5D=Class"
+link = f"https://cart.mindbodyonline.com/sites/14486/cart/add_booking?item%5Binfo%5D={DATE}
+&item%5Bmbo_id%5D={CLASS_ID}
+&item%5Bmbo_location_id%5D=1&item%5Bname%5D={CLASS}&item%5Btype%5D=Class"
 ```
