@@ -7,12 +7,18 @@ chance I'm doing that, so here we are.
 
 #### TODO
 
-- add logging
-- handle errors
 - something better for `user` + `pass`
 - improve project structure
 - add tests
 - setup automated testing
+
+#### Crontab
+
+* Run Monday-Wednesday + Friday at midnight
+
+```bash
+0 0 * * 1-3,5 trufusion
+```
 
 #### KT Class Schedule
 
