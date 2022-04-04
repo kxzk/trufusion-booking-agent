@@ -3,15 +3,17 @@ package main
 import (
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"regexp"
 	"strings"
+	"time"
 )
 
-// TODO: fix this, hacky AF
 const (
+	// TODO: re-do username/password to something better
 	username = ""
 	password = ""
 	session  = "https://cart.mindbodyonline.com/sites/14486/session/new"
@@ -34,18 +36,23 @@ func httpClient() *http.Client {
 }
 
 func request(client *http.Client, method, url string, body io.Reader) *http.Response {
-	req, _ := http.NewRequest(method, url, body)
-	resp, _ := client.Do(req)
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		log.Fatalf("error creating request: %s", err)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalf("error with request: %s", err)
+	}
 	return resp
 }
 
 func getAuthToken(body string) string {
+	// TODO: could still improve regex
 	re := regexp.MustCompile(`authenticity_token\" value=\"(.*)"`)
 	match := re.FindStringSubmatch(body)[1] // grab actual value
-
-	// TODO: make test
-	// if len(match) != 86 {
-	// }
+	/// len(`auth_token`) -> 86
 
 	return match
 }
@@ -61,6 +68,9 @@ func getEncodedVals(user, pass, utf, auth string) string {
 }
 
 func main() {
+	// add delay before running
+	time.Sleep(15 * time.Second)
+
 	client := httpClient()
 
 	// start session and get `authenticity_token` from body
@@ -81,6 +91,8 @@ func main() {
 	dayOfWeek := nextWeekDate.Weekday().String()
 
 	class := classSchedule[dayOfWeek][classPreference[dayOfWeek]]
+
+	log.Printf("class: %#v", class)
 
 	classDate := getFormattedDate(nextWeekDate, class.time)
 	classID := class.id + getClassIDOffset(isoWeek)
