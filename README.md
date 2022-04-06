@@ -15,9 +15,10 @@ chance I'm doing that, so here we are.
 #### Crontab
 
 * Run Monday-Wednesday + Friday at midnight
+* Hour -> 7 since UTC > PST by 7 hours
 
 ```bash
-0 0 * * 1-3,5 trufusion
+0 7 * * 1-3,5 trufusion
 ```
 
 #### KT Class Schedule

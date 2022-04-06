@@ -6,8 +6,10 @@ import (
 )
 
 func getNextWeekDate() time.Time {
+	// since remote server is not PST
+	tz, _ := time.LoadLocation("US/Pacific")
 	oneWeek := time.Hour * 24 * 7
-	return time.Now().Add(oneWeek)
+	return time.Now().In(tz).Add(oneWeek)
 }
 
 // convertMonth abbreviates a month's name.
