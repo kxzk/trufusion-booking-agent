@@ -2,7 +2,7 @@
 
 > Why?
 
-You have to book classes a week in advance at midnight. Absolutely zero
+One of the instructors is super popular; therefore, in order to get into her class you have to book a week prior at midnight. Absolutely zero
 chance I'm doing that, so here we are.
 
 #### TODO
