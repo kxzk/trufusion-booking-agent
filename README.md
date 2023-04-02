@@ -1,4 +1,4 @@
-# TruFusion Booking Agent
+<h3 align="center">TruFusion Booking Agent</h3>
 
 > Why?
 
